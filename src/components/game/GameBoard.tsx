@@ -2,6 +2,7 @@ import React from 'react';
 import { Ball, Paddle, Brick } from './';
 // import { GameStateData } from '../../types';
 type GameStateData = any;
+import { getWeekDates } from '../../utils/gameState';
 
 interface GameBoardProps {
   ball: any; // Using component Ball type
@@ -30,22 +31,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     onToggleLogging();
   };
 
-  // Получаем дни недели для заголовков
+  // Получаем дни недели для заголовков с учетом уровня
   const getWeekDayHeaders = () => {
-    const today = new Date();
-    const monday = new Date(today);
-    // Исправляем вычисление понедельника: getDay() возвращает 0 для воскресенья
-    const dayOfWeek = today.getDay();
-    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 0 = воскресенье, 1 = понедельник
-    monday.setDate(today.getDate() - daysToMonday);
-    
+    const weekDates = getWeekDates(gameState.level);
     const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']; // Только рабочие дни
     return dayNames.map((name, index) => {
-      const date = new Date(monday);
-      date.setDate(monday.getDate() + index);
+      const date = weekDates[index];
       return {
         name,
-        number: date.getDate()
+        number: date.getDate(),
+        fullDate: date
       };
     });
   };
@@ -130,6 +125,23 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         </div>
       )}
       
+      {/* Состояние завершения уровня */}
+      {gameState.state === 'levelComplete' && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/90">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600 mb-2">
+              Level {gameState.level - 1} Complete!
+            </div>
+            <div className="text-lg text-foreground mb-2">
+              Moving to Level {gameState.level}...
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Speed increased by 25%
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Состояние игры */}
       {gameState.state === 'gameOver' && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/90">
@@ -139,6 +151,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             </div>
             <div className="text-lg text-foreground">
               Score: {gameState.score}
+            </div>
+            <div className="text-sm text-muted-foreground mt-2">
+              Level reached: {gameState.level}
             </div>
           </div>
         </div>
@@ -154,7 +169,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               All meetings destroyed!
             </div>
             <div className="text-sm text-muted-foreground mt-2">
-              Score: {gameState.score}
+              Final Score: {gameState.score}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Levels completed: {gameState.level}
             </div>
           </div>
         </div>

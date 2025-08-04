@@ -9,6 +9,7 @@ interface Meeting {
 }
 
 import { parseICSFile, validateICSFile, createSampleICS } from '../utils/icsParser';
+import { filterMeetingsByWeek } from '../utils/gameState';
 
 interface UseICSReturn {
   meetings: Meeting[];
@@ -17,6 +18,7 @@ interface UseICSReturn {
   loadICSFile: (file: File) => Promise<void>;
   loadSampleMeetings: () => void;
   clearMeetings: () => void;
+  getMeetingsForLevel: (level: number) => Meeting[];
 }
 
 export const useICS = (): UseICSReturn => {
@@ -87,6 +89,11 @@ export const useICS = (): UseICSReturn => {
     setError(null);
   }, []);
 
+  // Получение встреч для конкретного уровня (недели)
+  const getMeetingsForLevel = useCallback((level: number): Meeting[] => {
+    return filterMeetingsByWeek(meetings, level);
+  }, [meetings]);
+
   return {
     meetings,
     isLoading,
@@ -94,5 +101,6 @@ export const useICS = (): UseICSReturn => {
     loadICSFile,
     loadSampleMeetings,
     clearMeetings,
+    getMeetingsForLevel,
   };
 }; 

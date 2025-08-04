@@ -90,7 +90,7 @@ export const createSampleICS = (): string => {
   const monday = new Date(today);
   monday.setDate(today.getDate() - today.getDay() + 1);
   
-  // Генерируем даты для текущей недели
+  // Генерируем даты для нескольких недель
   const formatDate = (date: Date) => {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -98,6 +98,7 @@ export const createSampleICS = (): string => {
     return `${year}${month}${day}`;
   };
 
+  // Текущая неделя (неделя 1)
   const mondayStr = formatDate(monday);
   const tuesday = new Date(monday);
   tuesday.setDate(monday.getDate() + 1);
@@ -114,6 +115,48 @@ export const createSampleICS = (): string => {
   const friday = new Date(monday);
   friday.setDate(monday.getDate() + 4);
   const fridayStr = formatDate(friday);
+
+  // Предыдущая неделя (неделя 2)
+  const prevMonday = new Date(monday);
+  prevMonday.setDate(monday.getDate() - 7);
+  const prevMondayStr = formatDate(prevMonday);
+  
+  const prevTuesday = new Date(prevMonday);
+  prevTuesday.setDate(prevMonday.getDate() + 1);
+  const prevTuesdayStr = formatDate(prevTuesday);
+  
+  const prevWednesday = new Date(prevMonday);
+  prevWednesday.setDate(prevMonday.getDate() + 2);
+  const prevWednesdayStr = formatDate(prevWednesday);
+  
+  const prevThursday = new Date(prevMonday);
+  prevThursday.setDate(prevMonday.getDate() + 3);
+  const prevThursdayStr = formatDate(prevThursday);
+  
+  const prevFriday = new Date(prevMonday);
+  prevFriday.setDate(prevMonday.getDate() + 4);
+  const prevFridayStr = formatDate(prevFriday);
+
+  // Неделя -2 (неделя 3)
+  const prevPrevMonday = new Date(monday);
+  prevPrevMonday.setDate(monday.getDate() - 14);
+  const prevPrevMondayStr = formatDate(prevPrevMonday);
+  
+  const prevPrevTuesday = new Date(prevPrevMonday);
+  prevPrevTuesday.setDate(prevPrevMonday.getDate() + 1);
+  const prevPrevTuesdayStr = formatDate(prevPrevTuesday);
+  
+  const prevPrevWednesday = new Date(prevPrevMonday);
+  prevPrevWednesday.setDate(prevPrevMonday.getDate() + 2);
+  const prevPrevWednesdayStr = formatDate(prevPrevWednesday);
+  
+  const prevPrevThursday = new Date(prevPrevMonday);
+  prevPrevThursday.setDate(prevPrevMonday.getDate() + 3);
+  const prevPrevThursdayStr = formatDate(prevPrevThursday);
+  
+  const prevPrevFriday = new Date(prevPrevMonday);
+  prevPrevFriday.setDate(prevPrevMonday.getDate() + 4);
+  const prevPrevFridayStr = formatDate(prevPrevFriday);
 
     return `BEGIN:VCALENDAR
 VERSION:2.0
@@ -213,6 +256,94 @@ DTSTART:${fridayStr}T160000Z
 DTEND:${fridayStr}T170000Z
 SUMMARY:End of Week Wrap-up
 DESCRIPTION:Weekly team wrap-up
+END:VEVENT
+BEGIN:VEVENT
+UID:meeting-13@company.com
+DTSTAMP:${prevMondayStr}T120000Z
+DTSTART:${prevMondayStr}T090000Z
+DTEND:${prevMondayStr}T100000Z
+SUMMARY:Previous Week - Team Retrospective
+DESCRIPTION:Sprint retrospective meeting
+END:VEVENT
+BEGIN:VEVENT
+UID:meeting-14@company.com
+DTSTAMP:${prevMondayStr}T120000Z
+DTSTART:${prevMondayStr}T140000Z
+DTEND:${prevMondayStr}T150000Z
+SUMMARY:Previous Week - Architecture Review
+DESCRIPTION:System architecture discussion
+END:VEVENT
+BEGIN:VEVENT
+UID:meeting-15@company.com
+DTSTAMP:${prevTuesdayStr}T120000Z
+DTSTART:${prevTuesdayStr}T100000Z
+DTEND:${prevTuesdayStr}T110000Z
+SUMMARY:Previous Week - Bug Triage
+DESCRIPTION:Critical bug prioritization
+END:VEVENT
+BEGIN:VEVENT
+UID:meeting-16@company.com
+DTSTAMP:${prevWednesdayStr}T120000Z
+DTSTART:${prevWednesdayStr}T090000Z
+DTEND:${prevWednesdayStr}T100000Z
+SUMMARY:Previous Week - Code Review
+DESCRIPTION:Feature branch review
+END:VEVENT
+BEGIN:VEVENT
+UID:meeting-17@company.com
+DTSTAMP:${prevThursdayStr}T120000Z
+DTSTART:${prevThursdayStr}T140000Z
+DTEND:${prevThursdayStr}T150000Z
+SUMMARY:Previous Week - Testing Strategy
+DESCRIPTION:QA process improvement
+END:VEVENT
+BEGIN:VEVENT
+UID:meeting-18@company.com
+DTSTAMP:${prevFridayStr}T120000Z
+DTSTART:${prevFridayStr}T160000Z
+DTEND:${prevFridayStr}T170000Z
+SUMMARY:Previous Week - Documentation Review
+DESCRIPTION:API documentation updates
+END:VEVENT
+BEGIN:VEVENT
+UID:meeting-19@company.com
+DTSTAMP:${prevPrevMondayStr}T120000Z
+DTSTART:${prevPrevMondayStr}T090000Z
+DTEND:${prevPrevMondayStr}T100000Z
+SUMMARY:Week -2 - Legacy System Migration
+DESCRIPTION:Legacy code migration planning
+END:VEVENT
+BEGIN:VEVENT
+UID:meeting-20@company.com
+DTSTAMP:${prevPrevTuesdayStr}T120000Z
+DTSTART:${prevPrevTuesdayStr}T140000Z
+DTEND:${prevPrevTuesdayStr}T150000Z
+SUMMARY:Week -2 - Infrastructure Planning
+DESCRIPTION:Cloud infrastructure setup
+END:VEVENT
+BEGIN:VEVENT
+UID:meeting-21@company.com
+DTSTAMP:${prevPrevWednesdayStr}T120000Z
+DTSTART:${prevPrevWednesdayStr}T100000Z
+DTEND:${prevPrevWednesdayStr}T110000Z
+SUMMARY:Week -2 - Security Review
+DESCRIPTION:Security audit preparation
+END:VEVENT
+BEGIN:VEVENT
+UID:meeting-22@company.com
+DTSTAMP:${prevPrevThursdayStr}T120000Z
+DTSTART:${prevPrevThursdayStr}T090000Z
+DTEND:${prevPrevThursdayStr}T100000Z
+SUMMARY:Week -2 - Performance Testing
+DESCRIPTION:Load testing results review
+END:VEVENT
+BEGIN:VEVENT
+UID:meeting-23@company.com
+DTSTAMP:${prevPrevFridayStr}T120000Z
+DTSTART:${prevPrevFridayStr}T160000Z
+DTEND:${prevPrevFridayStr}T170000Z
+SUMMARY:Week -2 - Final Review
+DESCRIPTION:Project completion review
 END:VEVENT
 END:VCALENDAR`;
 };

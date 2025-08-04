@@ -1,69 +1,89 @@
-# React + TypeScript + Vite
+# Meetings Slayer 🎮
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Уничтожайте встречи в календаре в виде классической игры Breakout! Загрузите свой ICS файл и начните игру.
 
-Currently, two official plugins are available:
+## 🚀 Новые возможности
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Система уровней
+- **Уровень 1**: Текущая неделя
+- **Уровень 2**: Предыдущая неделя  
+- **Уровень 3**: Неделя -2
+- И так далее...
 
-## Expanding the ESLint configuration
+### Прогрессивная сложность
+- **Скорость мяча**: увеличивается в 1.25 раза с каждым уровнем
+- **Скорость ракетки**: увеличивается в 1.25 раза с каждым уровнем
+- **Ускорение ракетки**: увеличивается в 1.25 раза с каждым уровнем
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Переход между уровнями
+- После уничтожения всех встреч текущей недели автоматически загружается следующая неделя
+- Пауза 2 секунды между уровнями с информацией о прогрессе
+- Отображение текущего уровня в интерфейсе
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🎯 Как играть
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+1. **Загрузите ICS файл** или используйте тестовые данные
+2. **Кликните на игровое поле** для запуска мяча
+3. **Используйте стрелки ← →** для управления ракеткой
+4. **Уничтожайте встречи** (блоки) мячом
+5. **Переходите на следующий уровень** после завершения текущей недели
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 🎮 Управление
+
+- **Клик**: запуск мяча
+- **← →**: движение ракетки
+- **Двойной клик**: включение/выключение отладки
+- **🔊**: включение/выключение звука
+
+## 📊 Интерфейс
+
+- **Score**: количество уничтоженных встреч × 10
+- **Lives**: количество жизней (3 по умолчанию)
+- **Level**: текущий уровень (неделя)
+
+## 🏆 Состояния игры
+
+- **Playing**: активная игра
+- **Level Complete**: завершение уровня, переход к следующему
+- **Victory**: полная победа (все уровни пройдены)
+- **Game Over**: проигрыш (закончились жизни)
+
+## 🛠 Технические детали
+
+### Система уровней
+```javascript
+// Получение настроек для уровня
+const settings = getLevelSettings(level);
+// Скорость = базовая_скорость * (1.25 ^ (уровень - 1))
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Фильтрация встреч
+```javascript
+// Получение встреч для конкретной недели
+const weekMeetings = filterMeetingsByWeek(allMeetings, level);
 ```
+
+### Переход уровней
+- Автоматическое определение наличия встреч на следующей неделе
+- Плавная смена настроек скорости
+- Сброс позиций мяча и ракетки
+
+## 🎨 Особенности
+
+- **Визуальные эффекты**: взрывы, частицы, анимации
+- **Звуковые эффекты**: отскоки, взрывы, запуск мяча
+- **Адаптивный дизайн**: поддержка разных размеров экрана
+- **Отладка**: детальное логирование для разработчиков
+
+## 🚀 Запуск
+
+```bash
+npm install
+npm run dev
+```
+
+Откройте http://localhost:5173 в браузере.
+
+## 📝 Тестирование
+
+Игра включает тестовые данные с встречами на 3 недели для демонстрации системы уровней.

@@ -10,9 +10,23 @@ type GameSettings = any;
 // Настройки по умолчанию
 export const DEFAULT_GAME_SETTINGS: GameSettings = {
   ballSpeed: 300,
-  paddleSpeed: 800,
-  paddleAcceleration: 800,
+  paddleSpeed: 1600, // Увеличено с 800 до 1600 (в 2 раза)
+  paddleAcceleration: 1600, // Увеличено с 800 до 1600 (в 2 раза)
   lives: 3,
+};
+
+// Множитель скорости для каждого уровня
+export const LEVEL_SPEED_MULTIPLIER = 1.25;
+
+// Получение настроек для конкретного уровня
+export const getLevelSettings = (level: number): GameSettings => {
+  const speedMultiplier = Math.pow(LEVEL_SPEED_MULTIPLIER, level - 1);
+  return {
+    ballSpeed: DEFAULT_GAME_SETTINGS.ballSpeed * speedMultiplier,
+    paddleSpeed: DEFAULT_GAME_SETTINGS.paddleSpeed * speedMultiplier,
+    paddleAcceleration: DEFAULT_GAME_SETTINGS.paddleAcceleration * speedMultiplier,
+    lives: DEFAULT_GAME_SETTINGS.lives,
+  };
 };
 
 // Начальное состояние игры
@@ -42,22 +56,18 @@ export const createInitialPaddle = (width: number, height: number): Paddle => ({
   acceleration: 0,
 });
 
-// Создание сетки блоков в формате календаря с временными swimlanes
-export const createBrickGrid = (meetings: any[], width: number): Brick[] => {
-  const bricks: Brick[] = [];
-  const topMargin = 50;
-  const timeColumnWidth = 64; // Ширина колонки времени (16px * 4)
-  const dayColumnWidth = (width - timeColumnWidth) / 5; // 5 рабочих дней - равномерное распределение
-  const hourHeight = 25; // Высота каждого часа
-  // const timeSlots = 12; // Показываем только рабочие часы 8:00-20:00
-  
-  // Получаем рабочие дни текущей недели (Пн-Пт)
+// Получение дат для конкретной недели (неделя 1 = текущая, неделя 2 = предыдущая и т.д.)
+export const getWeekDates = (weekOffset: number = 0): Date[] => {
   const today = new Date();
   const monday = new Date(today);
-  // Исправляем вычисление понедельника: getDay() возвращает 0 для воскресенья
+  
+  // Вычисляем понедельник текущей недели
   const dayOfWeek = today.getDay();
-  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 0 = воскресенье, 1 = понедельник
+  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
   monday.setDate(today.getDate() - daysToMonday);
+  
+  // Переходим к нужной неделе (неделя 1 = текущая, неделя 2 = предыдущая)
+  monday.setDate(monday.getDate() - (weekOffset - 1) * 7);
   
   const weekDays: Date[] = [];
   for (let i = 0; i < 5; i++) { // Только 5 рабочих дней
@@ -65,21 +75,46 @@ export const createBrickGrid = (meetings: any[], width: number): Brick[] => {
     date.setDate(monday.getDate() + i);
     weekDays.push(date);
   }
+  
+  return weekDays;
+};
+
+// Фильтрация встреч по неделе
+export const filterMeetingsByWeek = (meetings: any[], weekOffset: number = 1): any[] => {
+  const weekDates = getWeekDates(weekOffset);
+  const weekStart = new Date(weekDates[0]);
+  weekStart.setHours(0, 0, 0, 0);
+  
+  const weekEnd = new Date(weekDates[4]);
+  weekEnd.setHours(23, 59, 59, 999);
+  
+  return meetings.filter(meeting => {
+    const meetingDate = new Date(meeting.startTime);
+    return meetingDate >= weekStart && meetingDate <= weekEnd;
+  });
+};
+
+// Создание сетки блоков в формате календаря с временными swimlanes
+export const createBrickGrid = (meetings: any[], width: number, level: number = 1): Brick[] => {
+  const bricks: Brick[] = [];
+  const topMargin = 50;
+  const timeColumnWidth = 64; // Ширина колонки времени (16px * 4)
+  const dayColumnWidth = (width - timeColumnWidth) / 5; // 5 рабочих дней - равномерное распределение
+  const hourHeight = 25; // Высота каждого часа
+  
+  // Получаем рабочие дни для текущего уровня
+  const weekDates = getWeekDates(level);
 
   // Группируем встречи по дням и часам
   const meetingsByDayHour: { [key: string]: any[] } = {};
-  
-
   
   let processedMeetings = 0;
   
   meetings.forEach(meeting => {
     const meetingDate = new Date(meeting.startTime);
-    const dayIndex = weekDays.findIndex(day => 
+    const dayIndex = weekDates.findIndex(day => 
       day.toDateString() === meetingDate.toDateString()
     );
-    
-
     
     if (dayIndex >= 0) {
       const startHour = Math.max(8, meetingDate.getHours()); // Начинаем с 8:00
@@ -102,8 +137,6 @@ export const createBrickGrid = (meetings: any[], width: number): Brick[] => {
     
     processedMeetings++;
   });
-  
-
 
   // Создаем кирпичи для каждого временного слота
   let totalBricks = 0;
@@ -122,8 +155,6 @@ export const createBrickGrid = (meetings: any[], width: number): Brick[] => {
         // Вычисляем высоту кирпича на основе продолжительности встречи
         const meetingDuration = meeting.duration || 1;
         const brickHeight = Math.min(meetingDuration * hourHeight, hourHeight * 3); // Максимум 3 часа
-        
-
         
         bricks.push({
           uid: uniqueKey, // Добавляем uid для блока
@@ -148,7 +179,6 @@ export const createBrickGrid = (meetings: any[], width: number): Brick[] => {
       }
     }
   }
-
 
   return bricks;
 };

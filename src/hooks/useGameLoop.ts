@@ -181,6 +181,16 @@ export const useGameLoop = ({
       });
     }
 
+    // Проверяем, остались ли еще блоки после уничтожения
+    const remainingBricks = newBricks.filter(brick => !brick.isDestroyed);
+    if (remainingBricks.length === 0 && bricksToUpdate) {
+      // Мгновенно останавливаем мяч при уничтожении последнего блока
+      newBall.velocity.x = 0;
+      newBall.velocity.y = 0;
+      newBall.position.x = paddle.position.x + paddle.width / 2;
+      newBall.position.y = paddle.position.y - 10;
+    }
+
     onBallUpdate(newBall);
     
     // Обновляем блоки только если были изменения

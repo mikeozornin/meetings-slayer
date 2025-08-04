@@ -22,7 +22,8 @@ import {
   createInitialBall, 
   createInitialPaddle, 
   createBrickGrid,
-  DEFAULT_GAME_SETTINGS,
+  getLevelSettings,
+  filterMeetingsByWeek,
   checkVictory,
   checkGameOver
 } from '../../utils/gameState';
@@ -38,7 +39,7 @@ export const GameEngine: React.FC<GameEngineProps> = ({
 }) => {
   // Состояние игры
   const [gameState, setGameState] = useState<GameStateData>(createInitialGameState());
-  const [settings] = useState<GameSettings>(DEFAULT_GAME_SETTINGS);
+  const [settings, setSettings] = useState<GameSettings>(getLevelSettings(1));
   
   // Игровые объекты
   const [ball, setBall] = useState<Ball>(createInitialBall(createInitialPaddle(800, 600)));
@@ -68,14 +69,26 @@ export const GameEngine: React.FC<GameEngineProps> = ({
     onGameStateUpdate: setGameState,
   });
 
+  // Загрузка встреч для текущего уровня
+  const loadLevelMeetings = useCallback((level: number) => {
+    const levelMeetings = filterMeetingsByWeek(meetings, level);
+    if (levelMeetings.length > 0) {
+      const newBricks = createBrickGrid(levelMeetings, dimensions.width, level);
+      setBricks(newBricks);
+      return true; // Уровень загружен успешно
+    }
+    return false; // Нет встреч для этого уровня
+  }, [meetings, dimensions.width]);
+
   // Инициализация игры при загрузке встреч
   useEffect(() => {
     if (meetings.length > 0) {
-      const newBricks = createBrickGrid(meetings, dimensions.width);
-      setBricks(newBricks);
-      setGameState((prev: GameStateData) => ({ ...prev, state: 'playing' }));
+      const levelLoaded = loadLevelMeetings(gameState.level);
+      if (levelLoaded) {
+        setGameState((prev: GameStateData) => ({ ...prev, state: 'playing' }));
+      }
     }
-  }, [meetings, dimensions.width]);
+  }, [meetings, gameState.level, loadLevelMeetings]);
 
   // Обновление размеров игрового поля
   useEffect(() => {
@@ -127,11 +140,50 @@ export const GameEngine: React.FC<GameEngineProps> = ({
     if (gameState.state !== 'playing') return;
 
     if (checkVictory(bricks)) {
-      setGameState((prev: GameStateData) => ({ ...prev, state: 'victory' }));
+      // Проверяем, есть ли следующий уровень
+      const nextLevel = gameState.level + 1;
+      const nextLevelMeetings = filterMeetingsByWeek(meetings, nextLevel);
+      
+      if (nextLevelMeetings.length > 0) {
+        // Переходим на следующий уровень
+        const newLevel = nextLevel;
+        const newSettings = getLevelSettings(newLevel);
+        
+        setGameState((prev: GameStateData) => ({ 
+          ...prev, 
+          level: newLevel,
+          state: 'levelComplete'
+        }));
+        
+        setSettings(newSettings);
+        
+        // Загружаем встречи следующего уровня
+        setTimeout(() => {
+          const levelLoaded = loadLevelMeetings(newLevel);
+          if (levelLoaded) {
+            // Сбрасываем мяч и ракетку для нового уровня
+            const newPaddle = createInitialPaddle(dimensions.width, dimensions.height);
+            const newBall = createInitialBall(newPaddle);
+            setPaddle(newPaddle);
+            setBall(newBall);
+            setGameState((prev: GameStateData) => ({ ...prev, state: 'playing' }));
+          } else {
+            // Если нет встреч для следующего уровня - победа
+            setGameState((prev: GameStateData) => ({ ...prev, state: 'victory' }));
+          }
+        }, 2000); // Пауза 2 секунды между уровнями
+        
+        if (isLoggingEnabled) {
+          console.log(`🎉 Level ${gameState.level} completed! Moving to level ${newLevel}`);
+        }
+      } else {
+        // Нет следующего уровня - полная победа
+        setGameState((prev: GameStateData) => ({ ...prev, state: 'victory' }));
+      }
     } else if (checkGameOver(ball, dimensions.height, gameState.lives)) {
       setGameState((prev: GameStateData) => ({ ...prev, state: 'gameOver' }));
     }
-  }, [bricks, ball, dimensions.height, gameState.lives, gameState.state]);
+  }, [bricks, ball, dimensions.height, gameState.lives, gameState.state, gameState.level, meetings, loadLevelMeetings, dimensions.width, isLoggingEnabled]);
 
   // Удаляем разрушенные блоки из массива
   useEffect(() => {
@@ -153,14 +205,18 @@ export const GameEngine: React.FC<GameEngineProps> = ({
 
   // Сброс игры
   const resetGame = useCallback(() => {
+    const initialSettings = getLevelSettings(1);
     setGameState(createInitialGameState());
+    setSettings(initialSettings);
     setBall(createInitialBall(paddle));
     setPaddle(createInitialPaddle(dimensions.width, dimensions.height));
     if (meetings.length > 0) {
-      const newBricks = createBrickGrid(meetings, dimensions.width);
-      setBricks(newBricks);
+      const levelLoaded = loadLevelMeetings(1);
+      if (levelLoaded) {
+        setGameState((prev: GameStateData) => ({ ...prev, state: 'playing' }));
+      }
     }
-  }, [meetings, dimensions, paddle]);
+  }, [meetings, dimensions, paddle, loadLevelMeetings]);
 
   // Обработка запуска мяча
   const handleLaunchBall = useCallback(() => {
@@ -172,7 +228,6 @@ export const GameEngine: React.FC<GameEngineProps> = ({
   // Обработка перезапуска игры
   const handleRestart = useCallback(() => {
     resetGame();
-    setGameState((prev: GameStateData) => ({ ...prev, state: 'playing' }));
   }, [resetGame]);
 
   // Обработка переключения логирования по двойному клику
@@ -201,6 +256,10 @@ export const GameEngine: React.FC<GameEngineProps> = ({
           <div className="text-sm">
             <span className="text-muted-foreground">Lives: </span>
             <span className="font-semibold">{gameState.lives}</span>
+          </div>
+          <div className="text-sm">
+            <span className="text-muted-foreground">Level: </span>
+            <span className="font-semibold">{gameState.level}</span>
           </div>
         </div>
         
