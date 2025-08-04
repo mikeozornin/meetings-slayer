@@ -9,7 +9,7 @@ interface PaddleProps {
 export const Paddle: React.FC<PaddleProps> = ({ paddle }) => {
   return (
     <div
-      className="absolute bg-primary rounded-md shadow-lg"
+      className="absolute bg-primary rounded-md shadow-lg paddle"
       style={{
         left: paddle.position.x,
         top: paddle.position.y,

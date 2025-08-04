@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { GameEngine } from './components/game/GameEngine';
 import { ICSFileUpload } from './components/calendar/ICSFileUpload';
+import { useTheme } from './hooks/useTheme';
 // import { GameStateData, Meeting } from './types';
 type GameStateData = any;
 type Meeting = any;
@@ -9,6 +10,9 @@ import { Gamepad, Calendar, Trophy } from 'lucide-react';
 function App() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [gameState, setGameState] = useState<GameStateData | null>(null);
+  
+  // Инициализируем системную тему
+  useTheme();
 
   const handleMeetingsLoaded = (loadedMeetings: Meeting[]) => {
     setMeetings(loadedMeetings);
@@ -19,9 +23,9 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen bg-background flex flex-col">
       {/* Заголовок */}
-      <header className="bg-card border-b">
+      <header className="bg-card border-b flex-shrink-0">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -54,18 +58,18 @@ function App() {
       </header>
 
       {/* Основной контент */}
-      <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <main className="container mx-auto px-4 py-6 flex-1">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
           {/* Панель загрузки встреч */}
-          <div className="lg:col-span-1">
-            <div className="bg-card border rounded-lg p-6">
+          <div className="lg:col-span-1 h-full">
+            <div className="bg-card border rounded-lg p-6 h-full">
               <ICSFileUpload onMeetingsLoaded={handleMeetingsLoaded} />
             </div>
           </div>
 
           {/* Игровое поле */}
           <div className="lg:col-span-2">
-            <div className="bg-card border rounded-lg h-[600px]">
+            <div className="bg-card border rounded-lg h-full">
               {meetings.length > 0 ? (
                 <GameEngine 
                   meetings={meetings} 

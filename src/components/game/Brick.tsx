@@ -120,7 +120,7 @@ export const Brick: React.FC<BrickProps> = ({ brick, onExplosionComplete }) => {
       {/* Блок */}
       <div
         ref={brickRef}
-        className={`absolute rounded border-2 transition-all duration-300 ${
+        className={`absolute rounded border-2 transition-all duration-300 brick ${
           isExploding 
             ? 'animate-pulse bg-destructive scale-110 opacity-50' 
             : isHit

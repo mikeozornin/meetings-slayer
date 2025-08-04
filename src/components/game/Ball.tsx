@@ -9,7 +9,7 @@ interface BallProps {
 export const Ball: React.FC<BallProps> = ({ ball }) => {
   return (
     <div
-      className="absolute bg-destructive rounded-full shadow-lg"
+      className="absolute bg-destructive rounded-full shadow-lg ball"
       style={{
         left: ball.position.x - ball.radius,
         top: ball.position.y - ball.radius,

@@ -55,3 +55,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Дополнительные стили для темного режима */
+@layer utilities {
+  .dark .game-board {
+    @apply border-primary/30;
+  }
+  
+  .dark .brick {
+    @apply bg-accent/80 hover:bg-accent/90;
+  }
+  
+  .dark .ball {
+    @apply shadow-lg shadow-destructive/50;
+  }
+  
+  .dark .paddle {
+    @apply shadow-lg shadow-primary/50;
+  }
+}

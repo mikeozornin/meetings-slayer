@@ -49,7 +49,7 @@ export const createInitialBall = (paddle: Paddle): Ball => ({
 
 // Создание начальной ракетки
 export const createInitialPaddle = (width: number, height: number): Paddle => ({
-  position: { x: width / 2 - 50, y: height - 60 },
+  position: { x: width / 2 - 50, y: height - 24 },
   width: 100,
   height: 10,
   velocity: 0,

@@ -49,7 +49,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   return (
     <div 
-      className="relative w-full h-full bg-background border-2 border-border rounded-lg overflow-hidden cursor-pointer"
+      className="relative w-full h-full bg-background border-2 border-border rounded-lg overflow-hidden cursor-pointer game-board"
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
@@ -85,8 +85,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               key={hour}
               className="absolute left-0 w-16 border-r border-border flex items-center justify-center"
               style={{
-                top: 50 + index * 27, // 40px для заголовка + отступы
-                height: 25
+                top: 50 + index * 35, // Увеличено расстояние между метками времени
+                height: 30
               }}
             >
               <span className="text-xs font-medium text-muted-foreground">
@@ -95,6 +95,19 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             </div>
           );
         })}
+        
+        {/* Дополнительное пространство под последним временем */}
+        <div
+          className="absolute left-0 w-16 border-r border-border flex items-center justify-center"
+          style={{
+            top: 50 + 12 * 35, // Позиция после последней метки времени
+            height: 30 // Такая же высота как у остальных меток времени
+          }}
+        >
+          <span className="text-xs font-medium text-muted-foreground">
+            20:00
+          </span>
+        </div>
         
         {/* Блоки */}
         {bricks.map((brick) => (
